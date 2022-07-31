@@ -586,6 +586,7 @@ TheoryCraft_Locale = {
 		{ id="Deathmist", translated="Deathmist Raiment" },
 		{ id="Felheart", translated="Felheart Raiment" },
 		{ id="Nemesis", translated="Nemesis Raiment" },
+		{ id="Plagueheart", translated="Plagueheart Raiment" },
 
 		{ id="Devout", translated="Vestments of the Devout" },
 		{ id="Virtuous", translated="Vestments of the Virtuous" },
@@ -747,9 +748,13 @@ TheoryCraft_Buffs = {
 	{ text="Magical damage and healing dealt is increased by (%d+)", type="All" },					-- ToEP
 	{ text="Healing increased by up to (%d+)", type="Healing" },							-- ZHC Healing
 	{ text="In addition, both the demon and master will inflict (%d+)%% more damage%.", type="Allbaseincrease", amount="n/100" },	-- Soul Link
+		
 }
 
 TheoryCraft_Debuffs = {
+
+	--{ text="Increases magic damage taken by up to 75 and healing by up to (%d+).", type="Healing", amount=150 },						-- healing wave
+	--{ text="Increases Healing Wave's effect by up to (%d+)", type="Healing Waveincrease" },							-- healing wave
 	{ text="Armor decreased by (%d+)%.", type="Sunder" },   							-- Sunder Armor
 	{ text="Armor decreased%.", type="DontMitigate", amount=1 },							-- Expose Armor
 	{ text="Frost spells have a (%d+)%% ", type="Frostcritchance" },   						-- Winter's Chill
@@ -759,10 +764,13 @@ TheoryCraft_Debuffs = {
 	{ text="Reduces Fire and Frost resistances by (%d+)%.", type="Frostpenetration" },				-- Curse of the Elements
 	{ text="Increases Fire and Frost damage taken by (%d+)%%%.", type="Firebaseincrease", amount="n/100" },		-- Curse of the Elements
 	{ text="Increases Fire and Frost damage taken by (%d+)%%%.", type="Frostbaseincrease", amount="n/100" },	-- Curse of the Elements
+	{ text="Shadow damage increased by (%d+)%%%.", type="Shadowbaseincrease", amount="n/100" },	-- Improved Shadow Bolt, Shadow Weaving
+	{ text="Increases Fire damage taken by (%d+)%%%.", type="Firebaseincrease", amount="n/100" },	-- Improved Scorch
 	{ text="Shadow and Arcane damage taken increased by (%d+)%%%.", type="Shadowbaseincrease", amount="n/100" },	-- Curse of shadows
 	{ text="Shadow and Arcane damage taken increased by (%d+)%%%.", type="Arcanebaseincrease", amount="n/100" },	-- Curse of shadows
 	{ text="Reduces Shadow and Arcane resistances by (%d+)%.", type="Shadowpenetration" },				-- Curse of Shadows
 	{ text="Reduces Shadow and Arcane resistances by (%d+)%.", type="Arcanepenetration" },				-- Curse of Shadows
+	{ text="Increases Nature damage taken by (%d+)%%.", type="Nature" },						-- Stormstrike
 	{ text="Increases Holy damage taken by up to (%d+)%%.", type="Holy" },						-- Judgement of Crusader
 	{ text="Frozen in place%.", type="doshatter", amount=1 },							-- Frost Nova
 	{ text="Frozen%.", type="doshatter", amount=1 },								-- Freezing Band?
@@ -867,6 +875,10 @@ TheoryCraft_SetsDequipOnly= {
 -- Checks every line beginning Set: for these
 
 TheoryCraft_Sets = {
+
+	{ text="(%d+)%%% increased damage on your Immolate spell.", type="Immolatemodifier", amount="n/100"},   	-- Plagueheart set bonus
+	{ text="Reduces health cost of your Life Tap by (%d+)%%%.", type="Life Tapmodifier", amount="n/100"},   	-- Plagueheart set bonus
+	{ text="Increases damage caused by your Corruption by (%d+)%%%.", type="Corruptionmodifier", amount="n/100"},   	-- Plagueheart set bonus
 	{ text="(%d+)%% of your Mana regeneration to continue while casting", type="ICPercent", amount="n/100" }, 	     	-- Stormrage/Trans
 	{ text="Your normal ranged attacks have a 4%% chance of restoring 200 mana%.", type="Beastmanarestore", amount=200 },	-- Beaststalker/Beastmaster
 	{ text="Health or Mana gained from Drain Life and Drain Mana increased by 15%%%.", type="Drain Lifeillum", amount=0.15 },	-- Felheart 3 piece bonus
@@ -1606,6 +1618,24 @@ TheoryCraft_SetBonuses = {
 		[4] = {
 			["pieces"] = 5,
 			["text"] = "Increases damage and healing done by magical spells and effects by up to 23.",
+		},
+	},
+	["Plagueheart Raiment"] = {
+		[1] = {
+			["pieces"] = 2,
+			["text"] = "Your Shadow Bolts now have a chance to heal you for 270 to 331.",
+		},
+		[2] = {
+			["pieces"] = 4,
+			["text"] = "Increases damage caused by your Corruption by 12%.",
+		},
+		[3] = {
+			["pieces"] = 6,
+			["text"] = "Your spell critical hits generate 25% less threat. In addition, Corruption, Immolate, Curse of Agony, and Siphon Life generate 25% less threat.",
+		},
+		[4] = {
+			["pieces"] = 8,
+			["text"] = "Reduces health cost of your Life Tap by 12%.",
 		},
 	},
 	["version"] = "1.04 Final Beta 2",

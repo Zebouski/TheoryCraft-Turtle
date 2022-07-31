@@ -1,6 +1,6 @@
 ## Interface: 11200
 ## Author: Aelian
-## Title: TheoryCraft
+## Title: [|cff3fcf26K|r] TheoryCraft -2.1
 ## Notes: Tells you everything about an ability, right on the tooltip.
 ## Version: 1.06.5
 ## SavedVariablesPerCharacter: TheoryCraft_Settings
