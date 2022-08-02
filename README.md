@@ -27,7 +27,8 @@ TheoryCraft can also show how your current gear is responsible for your extra da
 and also predict how much damage/healing that more stats would add.
 
 ## Migrating from TheoryCraft for blizzlike 1.12
-The original version of TC will conflict with this one. Delete your old wowfolder/Interface/AddOns/TheoryCraft/ folder.
+TheoryCraft-Turtle is a fork of the original version of TC, and they will conflict if you try using both. 
+Delete your old wowfolder/Interface/AddOns/TheoryCraft/ folder.
 
 To migrate your old TC settings, browse to wowfolder/WTF/Account/*username*/*realmname*/*charactername*/SavedVariables/ 
 and rename TheoryCraft.lua to TheoryCraft-Turtle.lua, and do the same to the file in wowfolder/WTF/Account/*username*/ 
