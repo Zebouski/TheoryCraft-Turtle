@@ -25,3 +25,10 @@ TheoryCraft's Embed option will update these values to their actual damage calcu
 
 TheoryCraft can also show how your current gear is responsible for your extra damage, 
 and also predict how much damage/healing that more stats would add.
+
+## Migrating from TheoryCraft for blizzlike 1.12
+The original version of TC will conflict with this one. Delete your old wowfolder/Interface/AddOns/TheoryCraft/ folder.
+
+To migrate your old TC settings, browse to wowfolder/WTF/Account/*username*/*realmname*/*charactername*/SavedVariables/ 
+and rename TheoryCraft.lua to TheoryCraft-Turtle.lua, and do the same to the file in wowfolder/WTF/Account/*username*/ 
+if you want to save the enemy mob and player armor values that TC has been estimating and storing.
