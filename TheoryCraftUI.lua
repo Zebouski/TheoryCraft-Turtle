@@ -593,6 +593,141 @@ function TheoryCraft_GB_Spellbook_UpdatePage(start, finish)
 	end
 end
 
+function TC_FindSpellID(spell, rank)
+	local i = 1;
+	local booktype = { "spell", "pet", };
+	local s,r;
+	local ys, yr;
+	for k, book in booktype do
+		while spell do
+			s, r = GetSpellName(i,book);
+			if ( not s ) then
+				i = 1;
+				break;
+			end
+			if ( string.lower(s) == string.lower(spell)) then ys=true; end
+			if ( (r == rank) or (r and rank and string.lower(r) == string.lower(rank))) then yr=true; end
+			if ( rank=='' and ys and (not GetSpellName(i+1, book) or string.lower(GetSpellName(i+1, book)) ~= string.lower(spell) )) then
+				yr = true; -- use highest spell rank if omitted
+			end
+			if ( ys and yr ) then
+				return i,book;
+			end
+			i=i+1;
+			ys = nil;
+			yr = nil;
+		end
+	end
+	return;
+end
+function TC_FindSpell(spell)
+	if not spell then return end;
+	local s = gsub(spell, "%s*(.*)%s*%(.*","%1");
+	local r="";
+	local num = tonumber(gsub( spell, "%D*(%d+)%D*", "%1"),10);
+	if ( string.find(spell, "%(%s*[Rr]acial")) then
+		r = "racial"
+	elseif ( string.find(spell, "%(%s*[Ss]ummon")) then
+		r = "summon"
+	elseif ( string.find(spell, "%(%s*[Aa]pprentice")) then
+		r = "apprentice"
+	elseif ( string.find(spell, "%(%s*[Jj]ourneyman")) then
+		r = "journeyman"
+	elseif ( string.find(spell, "%(%s*[Ee]xpert")) then
+		r = "expert"
+	elseif ( string.find(spell, "%(%s*[Aa]rtisan")) then
+		r = "artisan"
+	elseif ( string.find(spell, "%(%s*[Mm]aster")) then
+		r = "master"
+	elseif ( string.find(spell, "%(%s*[Mm]inor")) then
+		s=s.."(Minor)";
+	elseif ( string.find(spell, "%(%s*[Ll]esser")) then
+		s=s.."(Lesser)";
+	elseif ( string.find(spell, "%(%s*[Gg]reaterr")) then
+		s=s.."(Greater)";
+	elseif ( string.find(spell, "%(%s*[Ff]eral")) then
+		s=s.."(Feral)";
+	end
+	if ( string.find(spell, "[Rr]ank%s*%d+") and num and num > 0) then
+		r = gsub(spell, ".*%(.*[Rr]ank%s*(%d+).*", "Rank "..num);
+	end
+	return TC_FindSpellID(s,r);
+end
+
+function TC_FindFirstSpell( body )
+	if not body then return nil end;
+	local id, book, texture, spell;
+	while ( string.find(body, "CastSpellByName") ) do
+		spell = gsub(body,'^.-CastSpellByName.-%(.-(["\'])(.-)%1.*$','%2');
+		id, book = TC_FindSpell(spell);
+		if ( id ) then
+			texture = GetSpellTexture(id, book);
+			break;
+		end
+		body = gsub(body, "CastSpellByName","",1);
+	end
+	if ( not id and string.find(body,"/cast") ) then
+			spell = gsub(body,'^.-/cast *('.."[%w'%(%) %-:]+"..')[\n]?.*$','%1');
+			id, book = TC_FindSpell(spell);
+			if ( id and book ) then
+				texture = GetSpellTexture(id, book);
+			end
+	end
+	if ( not id ) then
+		while ( string.find(body, "[%p%s]cast%(") ) do
+			spell = gsub(body,'^.-[%p%s]-cast%(.-(["\'])(.-)%1.*$','%2');
+			id, book = TC_FindSpell(spell);
+			if ( id ) then
+				texture = GetSpellTexture(id, book);
+				break;
+			end
+			body = gsub(body, "[%p%s]cast%(","", 1);
+		end
+	end
+	if ( not id ) then
+		while ( string.find(body, "CastSpell")) do
+			spell = gsub(body,'^.-CastSpell.-%(%s*(.-)%s*)%s*%).*$','%1');
+			local _,_,spellid = strfind(spell,"^(%d+).*");
+			if ( spellid ) then
+				local _,_,spellbook=strfind(spell,"^.-"..spellid..",%s*'(%a+)'%s*");
+				id=spellid;
+				book=spellbook or 'spell';
+				texture = GetSpellTexture(id, book);
+				break;
+			end
+			body = gsub(body, "CastSpell","", 1);
+		end
+	end
+	return id, book, texture, spell;
+end
+
+if not SM_FindSpell then
+	SM_FindSpell = TC_FindSpell
+end
+
+local function GetMacroSpellData(button, spelldata, actionid)
+	if not spelldata then
+		if not actionid then actionid = ActionButton_GetPagedID(button); end
+		local macroname=GetActionText(actionid);
+		local actiontype, spell = nil, nil
+		local id, book, texture, spell
+		if SM_GetActionSpell then
+			local superfound = SM_ACTION and SM_ACTION[actionid];
+			actiontype, spell = SM_GetActionSpell(macroname, superfound);
+			if actiontype=="spell" then id, book = SM_FindSpell(spell); end
+		elseif macroname then
+			local name,_,body = GetMacroInfo(GetMacroIndexByName(macroname));
+			id, book, texture, spell = TC_FindFirstSpell(body);
+		end
+		if ( id ) then
+			local s, r = GetSpellName(id, book);
+			r = tonumber(findpattern(r, "%d+"))
+			spelldata = TheoryCraft_GetSpellDataByName(s, r)
+		end
+	end
+	return spelldata
+end
+
 function TheoryCraft_ButtonUpdate()
 	if this.oldupdatescript then
 		this.oldupdatescript()
@@ -715,18 +850,22 @@ function TheoryCraft_ButtonUpdate()
 			TCTooltip:SetOwner(UIParent,"ANCHOR_NONE")
 			TCTooltip:SetAction(buttontext:GetParent():GetID())
 			spelldata = TheoryCraft_GetSpellDataByFrame(TCTooltip)
+			spelldata = GetMacroSpellData(this, spelldata)
 		elseif buttontext.type == "Flippable" then
 			TCTooltip:SetOwner(UIParent,"ANCHOR_NONE")
 			TCTooltip:SetAction(buttontext:GetParent():GetID()+(CURRENT_ACTIONBAR_PAGE-1)*NUM_ACTIONBAR_BUTTONS)
 			spelldata = TheoryCraft_GetSpellDataByFrame(TCTooltip)
+			spelldata = GetMacroSpellData(this, spelldata)
 		elseif buttontext.type == "Special" then
 			TCTooltip:SetOwner(UIParent,"ANCHOR_NONE")
 			TCTooltip:SetAction(buttontext.specialid)
 			spelldata = TheoryCraft_GetSpellDataByFrame(TCTooltip)
+			spelldata = GetMacroSpellData(this, spelldata)
 		elseif buttontext.type == "Discord" then
 			TCTooltip:SetOwner(UIParent,"ANCHOR_NONE")
 			TCTooltip:SetAction(buttontext.actionbutton)
 			spelldata = TheoryCraft_GetSpellDataByFrame(TCTooltip)
+			spelldata = GetMacroSpellData(this, spelldata, buttontext.actionbutton)
 		elseif buttontext.type == "Gypsy" then
 			TCTooltip:SetOwner(UIParent,"ANCHOR_NONE")
 			TCTooltip:SetAction(Gypsy_ActionButton_GetPagedID (this))
